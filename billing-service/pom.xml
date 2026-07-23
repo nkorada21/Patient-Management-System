@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="
-            http://maven.apache.org/POM/4.0.0
-            https://maven.apache.org/xsd/maven-4.0.0.xsd">
+             http://maven.apache.org/POM/4.0.0
+             https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.0</version>
+        <version>3.4.5</version>
         <relativePath/>
     </parent>
 
@@ -23,14 +23,16 @@
     <description>Billing service for the Patient Management System</description>
 
     <properties>
-        <java.version>25</java.version>
+        <java.version>21</java.version>
         <grpc.version>1.75.0</grpc.version>
         <protobuf.version>3.25.5</protobuf.version>
+
+        <!-- Overrides vulnerable Logback 1.4.14 -->
+        <logback.version>1.5.38</logback.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!-- Keeps all io.grpc dependencies on the same version -->
             <dependency>
                 <groupId>io.grpc</groupId>
                 <artifactId>grpc-bom</artifactId>
@@ -45,25 +47,14 @@
         <!-- Spring MVC -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webmvc</artifactId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- gRPC transport -->
+        <!-- Automatic gRPC server integration -->
         <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-netty-shaded</artifactId>
-        </dependency>
-
-        <!-- gRPC Protocol Buffers integration -->
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-protobuf</artifactId>
-        </dependency>
-
-        <!-- Generated gRPC stubs -->
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-stub</artifactId>
+            <groupId>net.devh</groupId>
+            <artifactId>grpc-server-spring-boot-starter</artifactId>
+            <version>3.1.0.RELEASE</version>
         </dependency>
 
         <!-- Protocol Buffers runtime -->
@@ -73,7 +64,18 @@
             <version>${protobuf.version}</version>
         </dependency>
 
-        <!-- Required if generated code imports javax.annotation.Generated -->
+        <!-- Generated gRPC stubs -->
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-protobuf</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-stub</artifactId>
+        </dependency>
+
+        <!-- Required for generated javax.annotation.Generated references -->
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
@@ -84,14 +86,13 @@
         <!-- Tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <extensions>
-            <!-- Creates the os.detected.classifier property -->
             <extension>
                 <groupId>kr.motd.maven</groupId>
                 <artifactId>os-maven-plugin</artifactId>
@@ -100,7 +101,7 @@
         </extensions>
 
         <plugins>
-            <!-- Generate Java and gRPC classes from .proto files -->
+            <!-- Generate Java classes from proto files -->
             <plugin>
                 <groupId>org.xolstice.maven.plugins</groupId>
                 <artifactId>protobuf-maven-plugin</artifactId>
@@ -127,19 +128,9 @@
                             <goal>compile-custom</goal>
                         </goals>
                     </execution>
-
-                    <execution>
-                        <id>generate-test-protobuf-sources</id>
-
-                        <goals>
-                            <goal>test-compile</goal>
-                            <goal>test-compile-custom</goal>
-                        </goals>
-                    </execution>
                 </executions>
             </plugin>
 
-            <!-- Spring Boot packaging -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
