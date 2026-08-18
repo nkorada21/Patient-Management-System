@@ -39,14 +39,13 @@ public class AuthController {
     public ResponseEntity<Void> validateToken(@RequestHeader("Authorization") String authHeader) {
 
         // Authorization: Bearer <token>
-        if ((authHeader == null) || (!authHeader.startsWith("Bearer "))) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         return authService.validateToken(authHeader.substring(7))
-                ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-
-
+                ? ResponseEntity.ok().build()
+                : ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
 }
